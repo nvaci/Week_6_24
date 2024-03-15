@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Lecture 6: Confirmatory Factor Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Dr Nemanja Vaci" />
+    <meta name="date" content="2024-03-15" />
+    <script src="Week6_files/header-attrs/header-attrs.js"></script>
+    <script src="Week6_files/kePrint/kePrint.js"></script>
+    <link href="Week6_files/lightable/lightable.css" rel="stylesheet" />
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+.title[
+# Lecture 6: Confirmatory Factor Analysis
+]
+.author[
+### Dr Nemanja Vaci
+]
+.institute[
+### University of Sheffield
+]
+.date[
+### 2024-03-15
+]
+
+---
+
+
+
+
+
+## Press record
+
+---
+
+## Intended learning goals &lt;br/&gt;&lt;br/&gt;
+Motivate utilisation of path and CFA models; Argue how they relate to other models that we covered  &lt;br/&gt;&lt;br/&gt;
+Calculate number of free parameters and degrees of freedom of the proposed model. &lt;br/&gt;&lt;br/&gt;
+Build a model in R statistical environment, estimate, and interpret the coefficients. &lt;br/&gt;&lt;br/&gt;
+Criticise, modify, compare, and evaluate the fit of the proposed models. &lt;br/&gt;&lt;br/&gt;
+
+
+---
+
+## Latent space of measures
+
+Principal Component Analysis (PCA) &lt;br/&gt;&lt;br/&gt;
+Exploratory Factor Analysis (EFA) &lt;br/&gt;&lt;br/&gt;
+Confirmatory Factor Analysis (CFA)
+
+???
+Differences between PCA and EFA:&lt;br/&gt;&lt;br/&gt;
+[Link 1](https://stats.stackexchange.com/a/95106)&lt;br/&gt;&lt;br/&gt;
+[Link 2](https://stats.stackexchange.com/a/288646)
+---
+
+## Exploratory factor analysis (EFA)
+
+Multivariate statistical procedure (Spearman): understanding and accounting for variation and covariation among of set of observed variables by postulating __latent__ structures (factors)&lt;br/&gt;&lt;br/&gt;
+
+Factor: unobservable variable that influences more than one observed measure and accounts for their intercorrelation &lt;br/&gt;&lt;br/&gt;
+
+If we partial out latent construct then intercorrelations would be zero &lt;br/&gt;&lt;br/&gt;
+
+Factor analysis decomposes variance: __a) common variance (communality)__ and __b) unique variance__
+
+???
+Thourough example of EFA in R: https://psu-psychology.github.io/psy-597-SEM/06_factor_models/factor_models.html#overview
+---
+
+## EFA versus CFA
+
+Reproduce observer relationships between measured variables with smaller number of latent factors &lt;br/&gt;&lt;br/&gt;
+
+EFA is data-driven approach: weak or no assumptions on a number of latent dimensions and factor loadings (relations between indicators and factors) &lt;br/&gt; &lt;br/&gt;
+
+CFA is theory-driven approach: strong assumptions for both things &lt;br/&gt;&lt;br/&gt;
+
+EFA is used earlier in the process of questionnaire development and construct validation
+
+---
+
+## Factor model
+
+&lt;img src="image1.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Factor or measurement model
+
+Is linear regression where the main predictor is latent or unobserved:   &lt;br/&gt;
+
+`$$y_1=\tau_1+\lambda_1*\eta+\epsilon_1$$`&lt;br/&gt;&lt;br/&gt;
+`\(y_1=\tau_1+\lambda_1*\eta+\epsilon_1\)`&lt;br/&gt;
+`\(y_2=\tau_2+\lambda_2*\eta+\epsilon_2\)`&lt;br/&gt;
+`\(y_3=\tau_3+\lambda_3*\eta+\epsilon_3\)`&lt;br/&gt;&lt;br/&gt;
+
+
+`\(\tau\)` - the item intercepts or means&lt;br/&gt;
+`\(\lambda\)` - factor loadings - regression coefficients  &lt;br/&gt;
+`\(\epsilon\)` - error variances and covariances  &lt;br/&gt;
+`\(\eta\)` - the latent predictor of the items&lt;br/&gt;
+`\(\psi\)` - factor variances and covariances  &lt;br/&gt;
+---
+
+## Exploratory factor model
+
+&lt;img src="image2.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Confirmatory factor model
+
+&lt;img src="image3.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Defining latent variables
+
+LVs are not measured, however we can still infer them from the observed data. To be able to do so, we need to define their scale:
+
+1. Marker variable: single factor loading constraint to 1 &lt;br/&gt;&lt;br/&gt;
+2. Standardized latent variables: setting variance of variable to 1  (Z-score) &lt;br/&gt;&lt;br/&gt; 
+3. Effects-coding: constraints that all of the loadings to one LV average 1.0 or that their sum is equal to number of indicators
+
+???
+https://www.researchgate.net/publication/255606342_A_Non-arbitrary_Method_of_Identifying_and_Scaling_Latent_Variables_in_SEM_and_MACS_Models
+---
+## Indicator variable and Standardizing LVs
+
+&lt;img src="IndVar.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Effect coding 
+
+&lt;img src="Effect.png" width="40%" style="display: block; margin: auto;" /&gt;
+
+---
+## Identification of the CFA
+
+
+
+
+
+Total number of parameters that we can estimate: `\(\frac{variables*(variables+1)}{2}\)` &lt;br/&gt; &lt;br/&gt; &lt;br/&gt;
+
+
+```r
+Matrix&lt;-cov(vars)
+Matrix[upper.tri(Matrix)]&lt;-NA
+knitr::kable(Matrix, format = 'html', digits=2) %&gt;%
+  kable_styling(font_size = 9)
+```
+
+&lt;table class="table" style="font-size: 9px; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; TimeOnTummy &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; PreciseLegMoves &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; PreciseHandMoves &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Babbling &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Screeching &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; VocalImitation &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; TimeOnTummy &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.80 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PreciseLegMoves &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22.82 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PreciseHandMoves &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 10.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 9.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.27 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Babbling &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.35 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.04 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.52 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 24.69 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Screeching &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.59 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1.72 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.08 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; VocalImitation &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.71 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.46 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.33 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11.31 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4.81 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25.01 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+## Theory and previous results
+
+Previous work in this area found that two __congeneric__ latent factors explain covariances of our six indicators: motoric and verbal latent component &lt;br/&gt;&lt;br/&gt;
+
+&lt;img src="image4.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+## Estimated number of parameters
+
+&lt;img src="parameters.png" width="50%" style="display: block; margin: auto;" /&gt;
+--
+Loadings `\((\lambda)\)`: 4 parameters&lt;br/&gt;&lt;br/&gt;
+Residual variances `\((\epsilon)\)` : 6 parameters&lt;br/&gt;&lt;br/&gt;
+Factor variances and covariances `\((\psi)\)` : 3 parameters&lt;br/&gt;&lt;br/&gt;
+With intercepts: + 6 
+---
+
+## Coding of our model
+
+
+```r
+#install.packages('lavaan')
+require(lavaan)
+model1&lt;-'
+motor =~ TimeOnTummy + PreciseLegMoves + PreciseHandMoves
+verbal =~ Babbling + Screeching + VocalImitation
+'
+
+fit1&lt;-cfa(model1, data=Babies)
+```
+
+&lt;style type="text/css"&gt;
+pre {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height: 70px;
+}
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.scroll-100 {
+  max-height: 70px;
+  overflow-y: auto;
+  background-color: inherit;
+}
+&lt;/style&gt;
+---
+
+## Results of the model
+
+
+```r
+summary(fit1)
+```
+
+```
+## lavaan 0.6.15 ended normally after 74 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        13
+## 
+##   Number of observations                           100
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 3.376
+##   Degrees of freedom                                 8
+##   P-value (Chi-square)                           0.909
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TimeOnTummy       1.000                           
+##     PreciseLegMovs    0.910    0.240    3.791    0.000
+##     PreciseHandMvs    1.099    0.293    3.746    0.000
+##   verbal =~                                           
+##     Babbling          1.000                           
+##     Screeching        0.494    0.182    2.718    0.007
+##     VocalImitation    0.716    0.246    2.906    0.004
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal            3.433    1.901    1.806    0.071
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      15.031    3.181    4.725    0.000
+##    .PreciseLegMovs   14.709    2.867    5.130    0.000
+##    .PreciseHandMvs   12.515    3.338    3.749    0.000
+##    .Babbling          8.805    5.149    1.710    0.087
+##    .Screeching       17.139    2.748    6.236    0.000
+##    .VocalImitation   16.742    3.514    4.764    0.000
+##     motor             9.523    3.625    2.627    0.009
+##     verbal           15.635    5.947    2.629    0.009
+```
+
+---
+
+## Results: visual
+
+
+&lt;img src="image6.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Interpretation of the coefficients: factor loadings
+
+- When unstandardized and loaded on a single factor, then unstandardized regression coefficients. Model predicted difference in the predictor (measured variable) between groups that differ in 1-unit on the LVs &lt;br/&gt;  &lt;br/&gt;
+
+- When loaded on multiple factors, then regression coefficients become contingent on other factors (check Lecture 1, slide 11)  &lt;br/&gt;  &lt;br/&gt;
+
+- When standardized and loaded on a single factor (congeneric structure), then standardized loadings are estimated correlations between indicators and LVs &lt;br/&gt;  &lt;br/&gt;
+
+- When standardized and loaded on a multiple factors, then same as the second option only standardized (beta weights)  &lt;br/&gt;
+
+---
+
+## Results of the model
+
+
+```r
+summary(fit1, standardized=TRUE)
+```
+
+```
+## lavaan 0.6.15 ended normally after 74 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        13
+## 
+##   Number of observations                           100
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 3.376
+##   Degrees of freedom                                 8
+##   P-value (Chi-square)                           0.909
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   motor =~                                                              
+##     TimeOnTummy       1.000                               3.086    0.623
+##     PreciseLegMovs    0.910    0.240    3.791    0.000    2.807    0.591
+##     PreciseHandMvs    1.099    0.293    3.746    0.000    3.392    0.692
+##   verbal =~                                                             
+##     Babbling          1.000                               3.954    0.800
+##     Screeching        0.494    0.182    2.718    0.007    1.952    0.426
+##     VocalImitation    0.716    0.246    2.906    0.004    2.832    0.569
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   motor ~~                                                              
+##     verbal            3.433    1.901    1.806    0.071    0.281    0.281
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##    .TimeOnTummy      15.031    3.181    4.725    0.000   15.031    0.612
+##    .PreciseLegMovs   14.709    2.867    5.130    0.000   14.709    0.651
+##    .PreciseHandMvs   12.515    3.338    3.749    0.000   12.515    0.521
+##    .Babbling          8.805    5.149    1.710    0.087    8.805    0.360
+##    .Screeching       17.139    2.748    6.236    0.000   17.139    0.818
+##    .VocalImitation   16.742    3.514    4.764    0.000   16.742    0.676
+##     motor             9.523    3.625    2.627    0.009    1.000    1.000
+##     verbal           15.635    5.947    2.629    0.009    1.000    1.000
+```
+
+---
+
+## Scaling LVs: variance = 1 
+
+
+```r
+model2&lt;-'
+motor =~ NA*TimeOnTummy + PreciseLegMoves + PreciseHandMoves
+verbal =~ NA*Babbling + Screeching + VocalImitation
+motor ~~ 1*motor
+verbal ~~ 1*verbal
+'
+
+fit2&lt;-cfa(model2, data=Babies)
+summary(fit2, standardized=TRUE)
+```
+
+```
+## lavaan 0.6.15 ended normally after 33 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        13
+## 
+##   Number of observations                           100
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 3.376
+##   Degrees of freedom                                 8
+##   P-value (Chi-square)                           0.909
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   motor =~                                                              
+##     TimeOnTummy       3.086    0.587    5.254    0.000    3.086    0.623
+##     PreciseLegMovs    2.807    0.557    5.042    0.000    2.807    0.591
+##     PreciseHandMvs    3.392    0.597    5.680    0.000    3.392    0.692
+##   verbal =~                                                             
+##     Babbling          3.954    0.752    5.259    0.000    3.954    0.800
+##     Screeching        1.952    0.548    3.560    0.000    1.952    0.426
+##     VocalImitation    2.832    0.646    4.381    0.000    2.832    0.569
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   motor ~~                                                              
+##     verbal            0.281    0.139    2.028    0.043    0.281    0.281
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##     motor             1.000                               1.000    1.000
+##     verbal            1.000                               1.000    1.000
+##    .TimeOnTummy      15.031    3.181    4.725    0.000   15.031    0.612
+##    .PreciseLegMovs   14.709    2.867    5.130    0.000   14.709    0.651
+##    .PreciseHandMvs   12.515    3.338    3.749    0.000   12.515    0.521
+##    .Babbling          8.805    5.149    1.710    0.087    8.805    0.360
+##    .Screeching       17.139    2.748    6.236    0.000   17.139    0.818
+##    .VocalImitation   16.742    3.514    4.764    0.000   16.742    0.676
+```
+
+---
+
+## Scaling LVs: effect coding
+
+
+```r
+model3&lt;-'
+motor =~ NA*TimeOnTummy+a*TimeOnTummy + b*PreciseLegMoves + c*PreciseHandMoves
+verbal =~ NA*Babbling+a1*Babbling + b1*Screeching + c1*VocalImitation
+a+b+c==3
+a1+b1+c1==3
+'
+
+fit3&lt;-cfa(model3, data=Babies)
+summary(fit3, standardized=TRUE)
+```
+
+```
+## lavaan 0.6.15 ended normally after 58 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        15
+##   Number of equality constraints                     2
+## 
+##   Number of observations                           100
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 3.376
+##   Degrees of freedom                                 8
+##   P-value (Chi-square)                           0.909
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   motor =~                                                              
+##     TimOnTmmy  (a)    0.997    0.153    6.524    0.000    3.086    0.623
+##     PrcsLgMvs  (b)    0.907    0.146    6.227    0.000    2.807    0.591
+##     PrcsHndMv  (c)    1.096    0.162    6.770    0.000    3.392    0.692
+##   verbal =~                                                             
+##     Babbling  (a1)    1.358    0.236    5.753    0.000    3.954    0.800
+##     Screechng (b1)    0.670    0.158    4.236    0.000    1.952    0.426
+##     VoclImttn (c1)    0.972    0.189    5.140    0.000    2.832    0.569
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   motor ~~                                                              
+##     verbal            2.536    1.341    1.891    0.059    0.281    0.281
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##    .TimeOnTummy      15.031    3.181    4.725    0.000   15.031    0.612
+##    .PreciseLegMovs   14.709    2.867    5.130    0.000   14.709    0.651
+##    .PreciseHandMvs   12.515    3.338    3.749    0.000   12.515    0.521
+##    .Babbling          8.805    5.149    1.710    0.087    8.805    0.360
+##    .Screeching       17.139    2.748    6.236    0.000   17.139    0.818
+##    .VocalImitation   16.742    3.514    4.764    0.000   16.742    0.676
+##     motor             9.581    2.070    4.628    0.000    1.000    1.000
+##     verbal            8.483    1.896    4.475    0.000    1.000    1.000
+## 
+## Constraints:
+##                                                |Slack|
+##     a+b+c - (3)                                  0.000
+##     a1+b1+c1 - (3)                               0.000
+```
+
+---
+
+## Adding intercepts
+
+
+```r
+model3&lt;-'
+motor =~ TimeOnTummy + PreciseLegMoves + PreciseHandMoves
+verbal =~ Babbling + Screeching + VocalImitation
+TimeOnTummy ~ 1
+PreciseLegMoves ~ 1
+PreciseHandMoves ~ 1
+Babbling ~ 1
+Screeching ~ 1 
+VocalImitation ~ 1'
+fit3&lt;-cfa(model3, data=Babies)
+summary(fit3, standardized=TRUE, fit.measures=T)
+```
+
+```
+## lavaan 0.6.15 ended normally after 74 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        19
+## 
+##   Number of observations                           100
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 3.376
+##   Degrees of freedom                                 8
+##   P-value (Chi-square)                           0.909
+## 
+## Model Test Baseline Model:
+## 
+##   Test statistic                                88.357
+##   Degrees of freedom                                15
+##   P-value                                        0.000
+## 
+## User Model versus Baseline Model:
+## 
+##   Comparative Fit Index (CFI)                    1.000
+##   Tucker-Lewis Index (TLI)                       1.118
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)              -1756.127
+##   Loglikelihood unrestricted model (H1)      -1754.439
+##                                                       
+##   Akaike (AIC)                                3550.253
+##   Bayesian (BIC)                              3599.751
+##   Sample-size adjusted Bayesian (SABIC)       3539.744
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.000
+##   90 Percent confidence interval - lower         0.000
+##   90 Percent confidence interval - upper         0.047
+##   P-value H_0: RMSEA &lt;= 0.050                    0.954
+##   P-value H_0: RMSEA &gt;= 0.080                    0.015
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.034
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   motor =~                                                              
+##     TimeOnTummy       1.000                               3.086    0.623
+##     PreciseLegMovs    0.910    0.240    3.791    0.000    2.807    0.591
+##     PreciseHandMvs    1.099    0.293    3.746    0.000    3.392    0.692
+##   verbal =~                                                             
+##     Babbling          1.000                               3.954    0.800
+##     Screeching        0.494    0.182    2.718    0.007    1.952    0.426
+##     VocalImitation    0.716    0.246    2.906    0.004    2.832    0.569
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##   motor ~~                                                              
+##     verbal            3.433    1.901    1.806    0.071    0.281    0.281
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##    .TimeOnTummy      31.423    0.496   63.415    0.000   31.423    6.341
+##    .PreciseLegMovs   30.600    0.475   64.380    0.000   30.600    6.438
+##    .PreciseHandMvs   29.799    0.490   60.798    0.000   29.799    6.080
+##    .Babbling         29.946    0.494   60.573    0.000   29.946    6.057
+##    .Screeching       29.785    0.458   65.078    0.000   29.785    6.508
+##    .VocalImitation   30.409    0.498   61.110    0.000   30.409    6.111
+##     motor             0.000                               0.000    0.000
+##     verbal            0.000                               0.000    0.000
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+##    .TimeOnTummy      15.031    3.181    4.725    0.000   15.031    0.612
+##    .PreciseLegMovs   14.709    2.867    5.130    0.000   14.709    0.651
+##    .PreciseHandMvs   12.515    3.338    3.749    0.000   12.515    0.521
+##    .Babbling          8.805    5.149    1.710    0.087    8.805    0.360
+##    .Screeching       17.139    2.748    6.236    0.000   17.139    0.818
+##    .VocalImitation   16.742    3.514    4.764    0.000   16.742    0.676
+##     motor             9.523    3.625    2.627    0.009    1.000    1.000
+##     verbal           15.635    5.947    2.629    0.009    1.000    1.000
+```
+
+---
+
+## Indices of global model fit
+
+
+```r
+summary(fit1, fit.measures=TRUE)
+```
+
+```
+## lavaan 0.6.15 ended normally after 74 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        13
+## 
+##   Number of observations                           100
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                 3.376
+##   Degrees of freedom                                 8
+##   P-value (Chi-square)                           0.909
+## 
+## Model Test Baseline Model:
+## 
+##   Test statistic                                88.357
+##   Degrees of freedom                                15
+##   P-value                                        0.000
+## 
+## User Model versus Baseline Model:
+## 
+##   Comparative Fit Index (CFI)                    1.000
+##   Tucker-Lewis Index (TLI)                       1.118
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)              -1756.127
+##   Loglikelihood unrestricted model (H1)      -1754.439
+##                                                       
+##   Akaike (AIC)                                3538.253
+##   Bayesian (BIC)                              3572.120
+##   Sample-size adjusted Bayesian (SABIC)       3531.063
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.000
+##   90 Percent confidence interval - lower         0.000
+##   90 Percent confidence interval - upper         0.047
+##   P-value H_0: RMSEA &lt;= 0.050                    0.954
+##   P-value H_0: RMSEA &gt;= 0.080                    0.015
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.038
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TimeOnTummy       1.000                           
+##     PreciseLegMovs    0.910    0.240    3.791    0.000
+##     PreciseHandMvs    1.099    0.293    3.746    0.000
+##   verbal =~                                           
+##     Babbling          1.000                           
+##     Screeching        0.494    0.182    2.718    0.007
+##     VocalImitation    0.716    0.246    2.906    0.004
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal            3.433    1.901    1.806    0.071
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      15.031    3.181    4.725    0.000
+##    .PreciseLegMovs   14.709    2.867    5.130    0.000
+##    .PreciseHandMvs   12.515    3.338    3.749    0.000
+##    .Babbling          8.805    5.149    1.710    0.087
+##    .Screeching       17.139    2.748    6.236    0.000
+##    .VocalImitation   16.742    3.514    4.764    0.000
+##     motor             9.523    3.625    2.627    0.009
+##     verbal           15.635    5.947    2.629    0.009
+```
+
+???
+Measurement error in CFA: https://rdrr.io/cran/semTools/man/reliability.html
+---
+class: inverse, middle, center
+# Structural equation model
+---
+
+## SEM, finally
+
+&lt;img src="SEM.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Estimation of SEM
+
+
+```r
+model4&lt;-'
+#CFA model
+motor =~ TimeOnTummy + PreciseLegMoves + PreciseHandMoves
+verbal =~ Babbling + Screeching + VocalImitation
+
+#Path model
+motor ~ Age + Weight
+verbal ~ Age + Weight
+'
+
+fit4&lt;-sem(model4, data=Babies)
+```
+---
+## Structural equation model: Results
+
+
+```r
+summary(fit4, standardized=TRUE)
+```
+
+```
+## lavaan 0.6.15 ended normally after 81 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        17
+## 
+##   Number of observations                           100
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                13.018
+##   Degrees of freedom                                16
+##   P-value (Chi-square)                           0.671
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate    Std.Err  z-value  P(&gt;|z|)   Std.lv    Std.all
+##   motor =~                                                                  
+##     TimeOnTummy         1.000                                 3.064    0.618
+##     PreciseLegMovs      0.919    0.242    3.803    0.000      2.816    0.592
+##     PreciseHandMvs      1.111    0.295    3.765    0.000      3.403    0.694
+##   verbal =~                                                                 
+##     Babbling            1.000                                 3.498    0.708
+##     Screeching          0.583    0.189    3.089    0.002      2.040    0.446
+##     VocalImitation      0.899    0.263    3.422    0.001      3.144    0.632
+## 
+## Regressions:
+##                    Estimate    Std.Err  z-value  P(&gt;|z|)   Std.lv    Std.all
+##   motor ~                                                                   
+##     Age                -0.016    0.045   -0.355    0.723     -0.005   -0.043
+##     Weight              0.000    0.001    0.085    0.932      0.000    0.010
+##   verbal ~                                                                  
+##     Age                -0.041    0.051   -0.803    0.422     -0.012   -0.097
+##     Weight              0.002    0.001    2.108    0.035      0.001    0.263
+## 
+## Covariances:
+##                    Estimate    Std.Err  z-value  P(&gt;|z|)   Std.lv    Std.all
+##  .motor ~~                                                                  
+##    .verbal              3.292    1.738    1.894    0.058      0.320    0.320
+## 
+## Variances:
+##                    Estimate    Std.Err  z-value  P(&gt;|z|)   Std.lv    Std.all
+##    .TimeOnTummy        15.164    3.159    4.800    0.000     15.164    0.618
+##    .PreciseLegMovs     14.662    2.862    5.122    0.000     14.662    0.649
+##    .PreciseHandMvs     12.440    3.327    3.740    0.000     12.440    0.518
+##    .Babbling           12.204    3.740    3.263    0.001     12.204    0.499
+##    .Screeching         16.784    2.717    6.177    0.000     16.784    0.801
+##    .VocalImitation     14.880    3.440    4.326    0.000     14.880    0.601
+##    .motor               9.372    3.577    2.620    0.009      0.998    0.998
+##    .verbal             11.299    4.205    2.687    0.007      0.923    0.923
+```
+
+---
+class: inverse, middle, center
+# Measurement invariance 
+---
+
+## Measurement invariance
+
+Compare our model between the groups: &lt;br/&gt;
+ - Configural invarience: Model fitted for each group separately&lt;br/&gt;&lt;br/&gt;
+ - Metric invariance: restriction of the factor loadings, but intercepts are allowed to vary &lt;br/&gt;&lt;br/&gt;
+ - Scalar invariance: restriction of the both, factor loadings and intercepts&lt;br/&gt;&lt;br/&gt;
+ - Strict invariance: restriction on factor loadings, intercepts and residual variances 
+
+
+---
+
+## Configural invariance
+
+
+```r
+modelMI&lt;-'
+motor =~ TimeOnTummy + PreciseLegMoves + PreciseHandMoves
+verbal =~ Babbling + Screeching + VocalImitation
+'
+
+fitMIC&lt;-cfa(modelMI, data=Babies, group='Gender')
+summary(fitMIC)
+```
+
+```
+## lavaan 0.6.15 ended normally after 141 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        38
+## 
+##   Number of observations per group:                   
+##     Girls                                           48
+##     Boys                                            52
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                15.880
+##   Degrees of freedom                                16
+##   P-value (Chi-square)                           0.461
+##   Test statistic for each group:
+##     Girls                                        6.246
+##     Boys                                         9.634
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## 
+## Group 1 [Girls]:
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TimeOnTummy       1.000                           
+##     PreciseLegMovs    0.754    0.282    2.677    0.007
+##     PreciseHandMvs    0.982    0.345    2.849    0.004
+##   verbal =~                                           
+##     Babbling          1.000                           
+##     Screeching        0.428    0.237    1.809    0.070
+##     VocalImitation    0.632    0.313    2.021    0.043
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal            7.298    3.772    1.935    0.053
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      31.723    0.769   41.272    0.000
+##    .PreciseLegMovs   30.863    0.734   42.020    0.000
+##    .PreciseHandMvs   30.204    0.725   41.681    0.000
+##    .Babbling         29.693    0.781   37.997    0.000
+##    .Screeching       29.281    0.669   43.755    0.000
+##    .VocalImitation   30.893    0.750   41.215    0.000
+##     motor             0.000                           
+##     verbal            0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      15.328    5.201    2.947    0.003
+##    .PreciseLegMovs   18.476    4.570    4.042    0.000
+##    .PreciseHandMvs   12.648    4.739    2.669    0.008
+##    .Babbling         11.319    8.343    1.357    0.175
+##    .Screeching       18.192    4.110    4.426    0.000
+##    .VocalImitation   19.781    5.256    3.764    0.000
+##     motor            13.031    6.402    2.036    0.042
+##     verbal           17.992    9.733    1.849    0.065
+## 
+## 
+## Group 2 [Boys]:
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TimeOnTummy       1.000                           
+##     PreciseLegMovs    1.168    0.448    2.607    0.009
+##     PreciseHandMvs    1.106    0.409    2.706    0.007
+##   verbal =~                                           
+##     Babbling          1.000                           
+##     Screeching        0.410    0.238    1.727    0.084
+##     VocalImitation    0.562    0.302    1.861    0.063
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal           -0.787    2.007   -0.392    0.695
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      31.147    0.634   49.148    0.000
+##    .PreciseLegMovs   30.357    0.611   49.675    0.000
+##    .PreciseHandMvs   29.426    0.660   44.593    0.000
+##    .Babbling         30.179    0.617   48.873    0.000
+##    .Screeching       30.251    0.620   48.790    0.000
+##    .VocalImitation   29.962    0.655   45.744    0.000
+##     motor             0.000                           
+##     verbal            0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      13.783    3.710    3.715    0.000
+##    .PreciseLegMovs    9.737    3.951    2.465    0.014
+##    .PreciseHandMvs   13.963    4.139    3.373    0.001
+##    .Babbling         -0.009    9.707   -0.001    0.999
+##    .Screeching       16.649    3.652    4.559    0.000
+##    .VocalImitation   16.035    4.395    3.649    0.000
+##     motor             7.101    3.990    1.779    0.075
+##     verbal           19.837   10.457    1.897    0.058
+```
+
+---
+
+## Metric invariance: 1
+
+
+```r
+modelMI&lt;-'
+motor =~ TimeOnTummy + PreciseLegMoves + PreciseHandMoves
+verbal =~ Babbling + Screeching + VocalImitation
+'
+
+fitMIM&lt;-cfa(modelMI, data=Babies, group='Gender',group.equal='loadings')
+summary(fitMIM)
+```
+
+```
+## lavaan 0.6.15 ended normally after 135 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        38
+##   Number of equality constraints                     4
+## 
+##   Number of observations per group:                   
+##     Girls                                           48
+##     Boys                                            52
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                16.556
+##   Degrees of freedom                                20
+##   P-value (Chi-square)                           0.682
+##   Test statistic for each group:
+##     Girls                                        6.606
+##     Boys                                         9.951
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## 
+## Group 1 [Girls]:
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TmOnTmm           1.000                           
+##     PrcsLgM (.p2.)    0.949    0.247    3.840    0.000
+##     PrcsHnM (.p3.)    1.037    0.267    3.880    0.000
+##   verbal =~                                           
+##     Babblng           1.000                           
+##     Scrchng (.p5.)    0.430    0.164    2.619    0.009
+##     VclImtt (.p6.)    0.601    0.211    2.854    0.004
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal            7.124    3.399    2.096    0.036
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      31.723    0.757   41.929    0.000
+##    .PreciseLegMovs   30.863    0.751   41.121    0.000
+##    .PreciseHandMvs   30.204    0.722   41.828    0.000
+##    .Babbling         29.693    0.782   37.967    0.000
+##    .Screeching       29.281    0.671   43.661    0.000
+##    .VocalImitation   30.893    0.747   41.353    0.000
+##     motor             0.000                           
+##     verbal            0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      16.616    4.612    3.603    0.000
+##    .PreciseLegMovs   17.266    4.551    3.794    0.000
+##    .PreciseHandMvs   13.341    4.238    3.148    0.002
+##    .Babbling         10.817    7.130    1.517    0.129
+##    .Screeching       18.163    4.020    4.518    0.000
+##    .VocalImitation   20.094    4.867    4.128    0.000
+##     motor            10.861    4.723    2.300    0.021
+##     verbal           18.541    8.400    2.207    0.027
+## 
+## 
+## Group 2 [Boys]:
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TmOnTmm           1.000                           
+##     PrcsLgM (.p2.)    0.949    0.247    3.840    0.000
+##     PrcsHnM (.p3.)    1.037    0.267    3.880    0.000
+##   verbal =~                                           
+##     Babblng           1.000                           
+##     Scrchng (.p5.)    0.430    0.164    2.619    0.009
+##     VclImtt (.p6.)    0.601    0.211    2.854    0.004
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal           -0.695    2.209   -0.315    0.753
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      31.147    0.643   48.419    0.000
+##    .PreciseLegMovs   30.357    0.600   50.563    0.000
+##    .PreciseHandMvs   29.426    0.662   44.430    0.000
+##    .Babbling         30.179    0.617   48.879    0.000
+##    .Screeching       30.251    0.619   48.885    0.000
+##    .VocalImitation   29.962    0.657   45.613    0.000
+##     motor             0.000                           
+##     verbal            0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      12.951    3.622    3.576    0.000
+##    .PreciseLegMovs   11.037    3.171    3.481    0.000
+##    .PreciseHandMvs   13.593    3.843    3.537    0.000
+##    .Babbling          1.076    6.336    0.170    0.865
+##    .Screeching       16.449    3.442    4.779    0.000
+##    .VocalImitation   15.667    3.841    4.079    0.000
+##     motor             8.566    3.646    2.349    0.019
+##     verbal           18.747    7.377    2.541    0.011
+```
+
+---
+
+## Metric invariance: 2
+
+
+```r
+#install.packages('semTools')
+require(semTools)
+summary(compareFit(fitMIC, fitMIM))
+```
+
+```
+## ################### Nested Model Comparison #########################
+## 
+## Chi-Squared Difference Test
+## 
+##        Df    AIC    BIC  Chisq Chisq diff RMSEA Df diff Pr(&gt;Chisq)
+## fitMIC 16 3573.3 3672.3 15.880                                    
+## fitMIM 20 3566.0 3654.6 16.556    0.67673     0       4     0.9542
+## 
+## ####################### Model Fit Indices ###########################
+##          chisq df pvalue rmsea    cfi    tli  srmr       aic       bic
+## fitMIC 15.880† 16   .461 .000† 1.000† 1.003  .065  3573.335  3672.332 
+## fitMIM 16.556  20   .682 .000† 1.000† 1.067† .064† 3566.012† 3654.588†
+## 
+## ################## Differences in Fit Indices #######################
+##                 df rmsea cfi   tli   srmr    aic     bic
+## fitMIM - fitMIC  4     0   0 0.064 -0.001 -7.323 -17.744
+```
+
+---
+
+## Scalar invariance: 1
+
+
+```r
+modelMI&lt;-'
+motor =~ TimeOnTummy + PreciseLegMoves + PreciseHandMoves
+verbal =~ Babbling + Screeching + VocalImitation
+'
+
+fitMISc&lt;-cfa(modelMI, data=Babies, group='Gender',group.equal=c('loadings','intercepts'))
+summary(fitMISc)
+```
+
+```
+## lavaan 0.6.15 ended normally after 153 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        40
+##   Number of equality constraints                    10
+## 
+##   Number of observations per group:                   
+##     Girls                                           48
+##     Boys                                            52
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                19.394
+##   Degrees of freedom                                24
+##   P-value (Chi-square)                           0.731
+##   Test statistic for each group:
+##     Girls                                        8.252
+##     Boys                                        11.142
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## 
+## Group 1 [Girls]:
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TmOnTmm           1.000                           
+##     PrcsLgM (.p2.)    0.949    0.244    3.880    0.000
+##     PrcsHnM (.p3.)    1.045    0.266    3.925    0.000
+##   verbal =~                                           
+##     Babblng           1.000                           
+##     Scrchng (.p5.)    0.410    0.163    2.510    0.012
+##     VclImtt (.p6.)    0.560    0.206    2.715    0.007
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal            7.181    3.418    2.101    0.036
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TmOnTmm (.16.)   31.753    0.661   48.007    0.000
+##    .PrcsLgM (.17.)   30.920    0.638   48.461    0.000
+##    .PrcsHnM (.18.)   30.141    0.661   45.611    0.000
+##    .Babblng (.19.)   29.775    0.767   38.801    0.000
+##    .Scrchng (.20.)   29.718    0.504   58.930    0.000
+##    .VclImtt (.21.)   30.219    0.575   52.515    0.000
+##     motor             0.000                           
+##     verbal            0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      16.671    4.605    3.620    0.000
+##    .PreciseLegMovs   17.293    4.543    3.807    0.000
+##    .PreciseHandMvs   13.265    4.238    3.130    0.002
+##    .Babbling          9.888    7.683    1.287    0.198
+##    .Screeching       18.494    4.071    4.543    0.000
+##    .VocalImitation   20.960    4.956    4.229    0.000
+##     motor            10.803    4.679    2.309    0.021
+##     verbal           19.542    8.992    2.173    0.030
+## 
+## 
+## Group 2 [Boys]:
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TmOnTmm           1.000                           
+##     PrcsLgM (.p2.)    0.949    0.244    3.880    0.000
+##     PrcsHnM (.p3.)    1.045    0.266    3.925    0.000
+##   verbal =~                                           
+##     Babblng           1.000                           
+##     Scrchng (.p5.)    0.410    0.163    2.510    0.012
+##     VclImtt (.p6.)    0.560    0.206    2.715    0.007
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal           -0.874    2.208   -0.396    0.692
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TmOnTmm (.16.)   31.753    0.661   48.007    0.000
+##    .PrcsLgM (.17.)   30.920    0.638   48.461    0.000
+##    .PrcsHnM (.18.)   30.141    0.661   45.611    0.000
+##    .Babblng (.19.)   29.775    0.767   38.801    0.000
+##    .Scrchng (.20.)   29.718    0.504   58.930    0.000
+##    .VclImtt (.21.)   30.219    0.575   52.515    0.000
+##     motor            -0.628    0.766   -0.819    0.413
+##     verbal            0.405    0.985    0.411    0.681
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TimeOnTummy      12.970    3.609    3.594    0.000
+##    .PreciseLegMovs   11.054    3.159    3.500    0.000
+##    .PreciseHandMvs   13.564    3.847    3.526    0.000
+##    .Babbling         -0.129    7.015   -0.018    0.985
+##    .Screeching       16.806    3.500    4.802    0.000
+##    .VocalImitation   16.307    3.880    4.203    0.000
+##     motor             8.523    3.612    2.359    0.018
+##     verbal           19.957    8.027    2.486    0.013
+```
+
+---
+
+## Scalar invariance: 2
+
+
+```r
+summary(compareFit(fitMIM,fitMISc))
+```
+
+```
+## ################### Nested Model Comparison #########################
+## 
+## Chi-Squared Difference Test
+## 
+##         Df    AIC    BIC  Chisq Chisq diff RMSEA Df diff Pr(&gt;Chisq)
+## fitMIM  20 3566.0 3654.6 16.556                                    
+## fitMISc 24 3560.8 3639.0 19.394     2.8375     0       4     0.5854
+## 
+## ####################### Model Fit Indices ###########################
+##           chisq df pvalue rmsea    cfi    tli  srmr       aic       bic
+## fitMIM  16.556† 20   .682 .000† 1.000† 1.067  .064† 3566.012  3654.588 
+## fitMISc 19.394  24   .731 .000† 1.000† 1.074† .071  3560.850† 3639.005†
+## 
+## ################## Differences in Fit Indices #######################
+##                  df rmsea cfi   tli  srmr    aic     bic
+## fitMISc - fitMIM  4     0   0 0.008 0.007 -5.162 -15.583
+```
+
+---
+
+## Strict invariance: 1
+
+
+```r
+modelMI&lt;-'
+motor =~ TimeOnTummy + PreciseLegMoves + PreciseHandMoves
+verbal =~ Babbling + Screeching + VocalImitation
+'
+
+fitMISt&lt;-cfa(modelMI, data=Babies, group='Gender',group.equal=c('loadings','intercepts','residuals'))
+summary(fitMISt)
+```
+
+```
+## lavaan 0.6.15 ended normally after 107 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        40
+##   Number of equality constraints                    16
+## 
+##   Number of observations per group:                   
+##     Girls                                           48
+##     Boys                                            52
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                                25.722
+##   Degrees of freedom                                30
+##   P-value (Chi-square)                           0.689
+##   Test statistic for each group:
+##     Girls                                       10.852
+##     Boys                                        14.870
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## 
+## Group 1 [Girls]:
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TmOnTmm           1.000                           
+##     PrcsLgM (.p2.)    0.916    0.237    3.858    0.000
+##     PrcsHnM (.p3.)    1.046    0.270    3.872    0.000
+##   verbal =~                                           
+##     Babblng           1.000                           
+##     Scrchng (.p5.)    0.357    0.152    2.352    0.019
+##     VclImtt (.p6.)    0.497    0.194    2.561    0.010
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal            7.237    3.475    2.083    0.037
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TmOnTmm (.16.)   31.754    0.663   47.879    0.000
+##    .PrcsLgM (.17.)   30.903    0.624   49.533    0.000
+##    .PrcsHnM (.18.)   30.145    0.673   44.815    0.000
+##    .Babblng (.19.)   29.707    0.776   38.266    0.000
+##    .Scrchng (.20.)   29.700    0.506   58.645    0.000
+##    .VclImtt (.21.)   30.290    0.582   52.081    0.000
+##     motor             0.000                           
+##     verbal            0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TmOnTmm (.p7.)   14.722    3.138    4.691    0.000
+##    .PrcsLgM (.p8.)   14.342    2.843    5.045    0.000
+##    .PrcsHnM (.p9.)   13.256    3.161    4.194    0.000
+##    .Babblng (.10.)    1.930    7.776    0.248    0.804
+##    .Scrchng (.11.)   18.072    2.752    6.568    0.000
+##    .VclImtt (.12.)   19.193    3.335    5.755    0.000
+##     motor            11.438    4.800    2.383    0.017
+##     verbal           27.035    9.847    2.745    0.006
+## 
+## 
+## Group 2 [Boys]:
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor =~                                            
+##     TmOnTmm           1.000                           
+##     PrcsLgM (.p2.)    0.916    0.237    3.858    0.000
+##     PrcsHnM (.p3.)    1.046    0.270    3.872    0.000
+##   verbal =~                                           
+##     Babblng           1.000                           
+##     Scrchng (.p5.)    0.357    0.152    2.352    0.019
+##     VclImtt (.p6.)    0.497    0.194    2.561    0.010
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   motor ~~                                            
+##     verbal           -0.554    2.239   -0.248    0.804
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TmOnTmm (.16.)   31.754    0.663   47.879    0.000
+##    .PrcsLgM (.17.)   30.903    0.624   49.533    0.000
+##    .PrcsHnM (.18.)   30.145    0.673   44.815    0.000
+##    .Babblng (.19.)   29.707    0.776   38.266    0.000
+##    .Scrchng (.20.)   29.700    0.506   58.645    0.000
+##    .VclImtt (.21.)   30.290    0.582   52.081    0.000
+##     motor            -0.635    0.772   -0.823    0.411
+##     verbal            0.459    0.994    0.462    0.644
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .TmOnTmm (.p7.)   14.722    3.138    4.691    0.000
+##    .PrcsLgM (.p8.)   14.342    2.843    5.045    0.000
+##    .PrcsHnM (.p9.)   13.256    3.161    4.194    0.000
+##    .Babblng (.10.)    1.930    7.776    0.248    0.804
+##    .Scrchng (.11.)   18.072    2.752    6.568    0.000
+##    .VclImtt (.12.)   19.193    3.335    5.755    0.000
+##     motor             8.157    3.558    2.292    0.022
+##     verbal           18.233    8.616    2.116    0.034
+```
+
+---
+
+## Strict invariance: 2
+
+
+```r
+summary(compareFit(fitMISc,fitMISt))
+```
+
+```
+## ################### Nested Model Comparison #########################
+## 
+## Chi-Squared Difference Test
+## 
+##         Df    AIC    BIC  Chisq Chisq diff    RMSEA Df diff Pr(&gt;Chisq)
+## fitMISc 24 3560.8 3639.0 19.394                                       
+## fitMISt 30 3555.2 3617.7 25.722      6.328 0.033067       6     0.3875
+## 
+## ####################### Model Fit Indices ###########################
+##           chisq df pvalue rmsea    cfi    tli  srmr       aic       bic
+## fitMISc 19.394† 24   .731 .000† 1.000† 1.074† .071† 3560.850  3639.005 
+## fitMISt 25.722  30   .689 .000† 1.000† 1.055  .079  3555.178† 3617.702†
+## 
+## ################## Differences in Fit Indices #######################
+##                   df rmsea cfi    tli  srmr    aic     bic
+## fitMISt - fitMISc  6     0   0 -0.019 0.008 -5.672 -21.303
+```
+
+---
+
+## Where are the differences
+
+
+```r
+lavTestScore(fitMISc)
+```
+
+```
+## $test
+## 
+## total score test:
+## 
+##    test    X2 df p.value
+## 1 score 3.387 10   0.971
+## 
+## $uni
+## 
+## univariate score tests:
+## 
+##      lhs op   rhs    X2 df p.value
+## 1   .p2. == .p25. 0.479  1   0.489
+## 2   .p3. == .p26. 0.015  1   0.903
+## 3   .p5. == .p28. 0.006  1   0.939
+## 4   .p6. == .p29. 0.047  1   0.828
+## 5  .p16. == .p39. 0.007  1   0.936
+## 6  .p17. == .p40. 0.021  1   0.885
+## 7  .p18. == .p41. 0.045  1   0.831
+## 8  .p19. == .p42. 0.278  1   0.598
+## 9  .p20. == .p43. 0.958  1   0.328
+## 10 .p21. == .p44. 1.948  1   0.163
+```
+
+---
+class: inverse, middle, center
+# Practical aspect
+---
+
+## Theory and data
+
+Holzinger and Swineford data (1939) - [LINK](https://www.rdocumentation.org/packages/psychTools/versions/2.0.8/topics/holzinger.swineford) &lt;br/&gt;
+
+
+```r
+#install.packages('sem')
+require(sem)
+data('HS.data')
+```
+
+&lt;img src="image7.png" width="55%" style="display: block; margin: auto;" /&gt;
+---
+
+## Model development 
+
+&lt;img src="Loop.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Important aspects: theory 
+
+- Understanding differences between Exploratory FA and Confirmatory FA &lt;br/&gt;
+- How is linear model defined in the CFA&lt;br/&gt;
+- Scaling of the latent variables &lt;br/&gt;
+- Interpretation of the coefficients &lt;br/&gt;
+- Number of free parameters versus total number of parameters &lt;br/&gt;
+
+---
+
+## Important aspects: practice
+
+- Specifying and estimating CFA model &lt;br/&gt;
+- Scaling the LVs by using marker variable or by scaling LVs variance to 1&lt;br/&gt;
+- Adding intercepts to your CFA model &lt;br/&gt;
+- Making a full SEM model &lt;br/&gt;
+
+---
+
+## Literature
+
+Confirmatory Factor Analysis for Applied Research by Timothy A. Brown  &lt;br/&gt; &lt;br/&gt;
+
+Chapters 9 of Principles and Practice of Structural Equation Modeling by Rex B. Kline &lt;br/&gt;&lt;br/&gt; 
+
+
+Latent Variable Modeling Using R: A Step-by-Step Guide by A. Alexander Beaujean &lt;br/&gt;&lt;br/&gt;
+
+---
+
+## Thank you for your attention
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
